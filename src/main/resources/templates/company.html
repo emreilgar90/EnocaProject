@@ -1,10 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
 <body>
-$END$
+<div class="container">
+    <!-- Header Alanı başlık kısmı burada olacak -->
+    <div class="row text-center text-success">
+        <h1 class="title-center">
+            <label th:text="${model.title}"></label>
+        </h1>
+    </div>
+    <!-- Header END -->
+
+    <!-- Body Alanımız -->
+    <div class="row">
+        <!-- ... (diğer kodlar) ... -->
+
+        <div class="col-md-8">
+            <!-- Input Alanı -->
+            <div class="row">
+                <form action="save" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="id" class="form-label">Id</label>
+                                <input type="text" class="form-control" id="id" name="id">
+                            </div>
+                            <div class="mb-3">
+                                <label for="companyName" class="form-label">Şirket Adı</label>
+                                <input type="text" class="form-control" id="companyName" name="companyName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="companyAddress" class="form-label">Şirket Adresi</label>
+                                <input type="text" class="form-control" id="companyAddress" name="companyAddress" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Şirket Şifresi</label>
+                                <input type="text" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rePassword" class="form-label">Şirket Şifresi Tekrar</label>
+                                <input type="text" class="form-control" id="rePassword" name="rePassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">K A Y D E T</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Input END -->
+
+            <!-- Tablo Alanı -->
+            <div class="row mt-5">
+                <table class="table table-hover table-border">
+                    <!-- ... (table başlıkları) ... -->
+                    <tbody>
+                    <tr th:each="company : ${model.companyProcesses}">
+                        <td><label th:text="${company.id}"></label></td>
+                        <td><label th:text="${company.name}"></label></td>
+                        <td><label th:text="${company.address}"></label></td>
+                        <td>
+                            <label th:each="employee : ${company.employeeList}" th:text="${employee.employeeName} + ' '"></label>
+                        </td>
+                        <td>
+                            <a href="#" class="btn btn-primary"
+                               th:attr="onclick=|duzenle('${company.id}','${company.name}','${company.address}')|"
+                               data-bs-toggle="modal" data-bs-target="#modalDuzenle">Düzenle</a>
+                            <a href="#" class="btn btn-danger"
+                               th:attr="onclick=|sil('${company.id}')|">Sil</a>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <!-- Tablo END -->
+        </div>
+    </div>
+    <!-- Body END -->
+</div>
+
+<!-- ... (diğer kodlar) ... -->
+
+<script>
+    function sil(id) {
+        const deleteid = document.getElementById('deleteid');
+        const deletebutton = document.getElementById('deletebutton');
+        deleteid.value = id;
+        Swal.fire({
+            title: 'Emin misin ?',
+            text: "Geri döndüremezsiniz ",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Evet, sil'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deletebutton.click();
+                Swal.fire(
+                    'Silindi!',
+                    'Dosyanız silindi.',
+                    'success'
+                )
+            }
+        })
+    }
+
+    function duzenle(id, companyName, companyAddress, password, rePassword, employeeList) {
+        const txtg_id = document.getElementById('g_id');
+        const txtg_companyName = document.getElementById('g_companyName');
+        const txtg_companyAddress = document.getElementById('g_companyAddress');
+        const txtg_password = document.getElementById('g_password');
+        const txtg_rePassword = document.getElementById('g_rePassword');
+        const txtg_employeeList = document.getElementById('g_employeeList');
+
+        txtg_id.value = id;
+        txtg_companyName.value = companyName;
+        txtg_companyAddress.value = companyAddress;
+        txtg_password.value = password;
+        txtg_rePassword.value = rePassword;
+        txtg_employeeList.value = employeeList;
+    }
+</script>
 </body>
-</html>

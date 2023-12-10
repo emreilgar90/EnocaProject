@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Success Page</title>
 </head>
 <body>
-$END$
+<h1>Kayıt Başarılı!</h1>
+<p>Merhaba, kaydınız başarıyla tamamlandı. Başka bir işlem yapmak ister misiniz?</p>
+<!-- Kayıt formu -->
+<form action="/registerCompany" method="post">
+    <!-- Gerekli input alanları -->
+    <input type="text" name="companyName" placeholder="Şirket Adı" required>
+    <input type="text" name="companyAddress" placeholder="Şirket Adresi" required>
+    <input type="text" name="password" placeholder="Şifre" required>
+    <input type="text" name="repassword" placeholder="Şifre Onay" required>
+    <!-- Diğer gerekli input alanları eklenebilir -->
+
+    <button type="submit">Yeni Kayıt Oluştur</button>
+</form>
 </body>
 </html>

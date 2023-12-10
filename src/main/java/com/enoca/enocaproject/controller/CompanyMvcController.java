@@ -4,108 +4,57 @@ import com.enoca.enocaproject.dto.request.CompanyRegisterRequestDto;
 import com.enoca.enocaproject.dto.request.CompanyUpdateRequestDto;
 import com.enoca.enocaproject.repository.entity.Company;
 import com.enoca.enocaproject.service.CompanyService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
+import java.io.IOException;
 import java.util.List;
-
-@Controller
-@RequestMapping("/company")
+import static com.enoca.enocaproject.constants.EndPoints.*;
+@RequestMapping(COMPANY)
 @RequiredArgsConstructor
-public class CompanyController {
-
+@Controller
+public class CompanyMvcController  {
     private final CompanyService companyService;
-    @GetMapping("/companyRegister")
+
+//    @GetMapping(INDEX)
+//    public ModelAndView index(){
+//        ModelAndView modelAndView = new ModelAndView();
+//        modelAndView.setViewName("company");
+//        CompanyIndexModel model = new CompanyIndexModel();
+//        model.setTitle(" Şirket İşlemleri");
+//        model.setCompanyProcesses(Arrays.asList("Şirket Ekleme","Şirket Silme","Şirket Güncelleme","Şirket Listeleme"));
+//       // model.setCompanyList(companyService.findAll());
+//        modelAndView.addObject("model",model);
+//        return modelAndView;
+//    }
+    @GetMapping(REGISTER)
     public ModelAndView getCompanyRegisterPage(){
-    ModelAndView modelAndView = new ModelAndView();
-    modelAndView.setViewName("companyRegister");
-    return modelAndView;
-
-    }
-    @PostMapping("/companyRegister")
-    public ModelAndView companyRegister(CompanyRegisterRequestDto dto) {
         ModelAndView modelAndView = new ModelAndView();
-        try {
-            companyService.companyRegister(dto);
-            modelAndView.setViewName("successPage"); // Başarılı olunduğunda yönlendirilecek sayfa
-            modelAndView.addObject("successMessage", "Kayıt başarıyla tamamlandı!"); // Başarı mesajı
-
-        } catch (Exception e) {
-            String error = e.getMessage();
-            modelAndView.setViewName("companyRegister");
-            modelAndView.addObject("errorMessage", error); // Hata mesajı
-        }
-
+        modelAndView.setViewName("registerCompany");
         return modelAndView;
     }
+    @Operation(summary = "Recording data directly through an endpoint. - Localden Veri Alıp Kaydetme")
+    @PostMapping(REGISTER)
+    public String registerCompany(@RequestParam("companyName") String companyName,
+                                  @RequestParam("companyAddress") String companyAddress,
+                                  @RequestParam("password") String password,
+                                  @RequestParam("repassword") String rePassword) throws IOException {
 
-    /******************************************************************************************************************/
-
-    @GetMapping("/companyRemove")
-    public ModelAndView getCompanyRemovePage(){
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("companyRemove");
-        return modelAndView;
-
+        CompanyRegisterRequestDto dto = new CompanyRegisterRequestDto();
+        dto.setCompanyName(companyName);
+        dto.setCompanyAddress(companyAddress);
+        dto.setPassword(password);
+        dto.setRePassword(rePassword);
+        companyService.register(dto);
+        return "successView";
     }
-    @DeleteMapping("/deleteCompany/{companyId}")
-    public ModelAndView deleteCompany(@PathVariable Long companyId) {
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-            companyService.deleteCompany(companyId);
-            modelAndView.setViewName("Hoşçakalın :( sayfası"); // Başarılı olunduğunda yönlendirilecek sayfa
-            modelAndView.addObject("successMessage", "Şirket başarıyla silindi!"); // Başarı mesajı
-        } catch (Exception e) {
-            String error = "Şirket silinirken bir hata oluştu.";
-            modelAndView.setViewName("errorPage");
-            modelAndView.addObject("errorMessage", error); // Hata mesajı
-        }
-
-        return modelAndView;
-    }
-
-    /******************************************************************************************************************/
-
-    @GetMapping("/updateCompany/{companyName}")
-    public ModelAndView getUpdateCompanyPage(@PathVariable String companyName) {
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-            Company company = companyService.getCompanyByName(companyName);
-            modelAndView.setViewName("updateCompany");
-            modelAndView.addObject("company", company);
-        } catch (Exception e) {
-            String error = "Şirket bilgileri alınamadı.";
-            modelAndView.setViewName("errorPage");
-            modelAndView.addObject("errorMessage", error);
-        }
-        return modelAndView;
-    }
-
-    @PostMapping("/updateCompany")
-    public ModelAndView updateCompany(CompanyUpdateRequestDto dto) {
-        ModelAndView modelAndView = new ModelAndView();
-
-        try {
-            companyService.updateCompany(dto);
-            modelAndView.setViewName("successPage"); // Başarılı olunduğunda yönlendirilecek sayfa
-            modelAndView.addObject("successMessage", "Şirket bilgileri başarıyla güncellendi!"); // Başarı mesajı
-        } catch (Exception e) {
-            String error = e.getMessage();
-            modelAndView.setViewName("updateCompany");
-            modelAndView.addObject("errorMessage", error); // Hata mesajı
-        }
-
-        return modelAndView;
-    }
-    /******************************************************************************************************************/
-
-    @GetMapping("/allCompany")
+    @GetMapping(FINDALL)   //"/allCompany"
     public ModelAndView getCompanyListPage() {
         ModelAndView modelAndView = new ModelAndView();
         try {
-            List<Company>companyList = companyService.getCompanyList();
+            List<Company> companyList = companyService.getCompanyList();
             modelAndView.setViewName("allCompany");
             modelAndView.addObject("company");
         } catch (Exception e) {
@@ -115,22 +64,50 @@ public class CompanyController {
         }
         return modelAndView;
     }
-
-    @PostMapping("/allCompany")
+    @Operation(summary = "List All Companies-Tüm Şirketleri Listele")
+    @PostMapping(FINDALL)
     public ModelAndView getCompanyList() {
+       companyService.findAll();
+       return new ModelAndView("redirect:index");
+    }
+    @GetMapping(UPDATE)
+    public ModelAndView getUpdateCompanyPage(@PathVariable Long id) {
         ModelAndView modelAndView = new ModelAndView();
-
         try {
-            companyService.getCompanyList();
-            modelAndView.setViewName("successPage"); // Başarılı olunduğunda yönlendirilecek sayfa
-            modelAndView.addObject("successMessage", "Şirket bilgileri başarıyla güncellendi!"); // Başarı mesajı
+            Company company = companyService.getCompany(id);
+            modelAndView.setViewName("updateCompany");
+            modelAndView.addObject("company", company);
         } catch (Exception e) {
-            String error = e.getMessage();
-            modelAndView.setViewName("allCompany");
-            modelAndView.addObject("errorMessage", error); // Hata mesajı
+            String error = "Şirket bilgileri alınamadı.";
+            modelAndView.setViewName("errorPage");
+            modelAndView.addObject("errorMessage", error);
         }
-
         return modelAndView;
     }
+    @Operation(summary = "Update-Güncelleme")
+    @PutMapping(UPDATE)
+    public ModelAndView updateCompany(@PathVariable Long id,@RequestBody CompanyUpdateRequestDto dto) {
+       companyService.updateCompany(id,dto);
+        return new ModelAndView("redirect:index");
+    }
+        @GetMapping(DELETEBYID) //+
+    public ModelAndView getCompanyRemovePage(){
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("companyRemove");
+        return modelAndView;
+    }
+
+    @Operation(summary = "Delete-Id'ye Göre Silme")
+    @DeleteMapping(DELETEBYID) //+
+    public ModelAndView delete(@PathVariable Long id) {
+            System.out.println("Silme işlemi çalıştı silinen id ...: "+ id);
+            try{
+                if(id !=null && id>0)
+                    companyService.deleteById(id);
+            }catch (Exception exception){
+                System.out.println("hata oluştu...: "+ exception.toString());
+            }
+            return new ModelAndView("redirect:index");
+        }
 
 }
